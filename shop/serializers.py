@@ -1,3 +1,4 @@
+from dataclasses import field
 from rest_framework import serializers
 from .models import Product, Category, Comment, Like, Rating
 
@@ -27,7 +28,7 @@ class ProductSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        exclude = ['user']
+        fields = '__all__'
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
