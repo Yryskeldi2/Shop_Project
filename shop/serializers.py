@@ -10,17 +10,17 @@ class ProductSerializer(serializers.ModelSerializer):
         rep = super().to_representation(instance)
         rep["comment"] = CommentSerializer(instance.comments.all(), many=True).data
         rep["likes"] = instance.likes.all().count()
-        rep["rating"] = instance.get_average_rating()
+        rep["rating"] = instance.average_rating
         rep["like_by_user"] = False
         rep["user_ratings"] = 0
 
         request = self.context.get('request')
 
         if request.user.is_authenticated:
-           rep["like_by_user"] = Like.objects.filter(user=request.user, product=instance).exists()
-        if Rating.objects.filter(user=request.user, product=instance).exists():
-            rating = Rating.objects.get(user=request.user, product=instance)
-            rep["user_rating"] = rating.value
+            rep["like_by_user"] = Like.objects.filter(user=request.user, product=instance).exists()
+            if Rating.objects.filter(user=request.user, product=instance).exists():
+                rating = Rating.objects.get(user=request.user, product=instance)
+                rep["user_rating"] = rating.value
 
         return rep
 

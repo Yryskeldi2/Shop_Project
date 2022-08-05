@@ -1,10 +1,11 @@
 
 from django.shortcuts import get_object_or_404
-from rest_framework import mixins
+from rest_framework import mixins, filters
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
+
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
@@ -19,6 +20,8 @@ class ProductViewset(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ['title', 'price']
 
 
     def get_serializer_context(self):
@@ -39,6 +42,15 @@ class ProductViewset(ModelViewSet):
         serializer = ProductSerializer(queryset, many=True, context={"request":request})
         return Response(serializer.data, 200)
 
+    @action(methods=["GET"], detail=False)
+    def order_by_rating(self, request):
+        queryset = self.get_queryset()
+
+        queryset = sorted(queryset, key=lambda product: product.average_rating, reverse=True)
+        
+        serializer = ProductSerializer(queryset, many=True, context={"request":request})
+        return Response(serializer.data, 200)
+        
 
 
 
