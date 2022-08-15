@@ -66,4 +66,3 @@ class User(AbstractUser):
         message = f'Activate your account, following this link {activation_url}'
         send_mail('Activate account', message, 'shop@gmail.com', [self.email])
 
-
